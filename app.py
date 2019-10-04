@@ -28,6 +28,15 @@ def detect(image):
     imageBlob = cv2.dnn.blobFromImage(
         cv2.resize(image, (300, 300)), 1.0, (300, 300),
         (104.0, 177.0, 123.0), swapRB=False, crop=False)
+    protoPath = os.path.sep.join(["face_detection_model", "deploy.prototxt"])
+    modelPath = os.path.sep.join(["face_detection_model",
+    "res10_300x300_ssd_iter_140000.caffemodel"])
+    detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
+
+    embedder = cv2.dnn.readNetFromTorch("openface_nn4.small2.v1.t7")
+    recognizer = pickle.loads(open("output/recognizer.pickle", "rb").read())
+    le = pickle.loads(open("output/le.pickle", "rb").read())
+
     detector.setInput(imageBlob)
     detections = detector.forward()
     for i in range(0, detections.shape[2]):
@@ -117,15 +126,7 @@ def predict():
 '''main function to run'''    
 if __name__ == "__main__":
     print(("Loading"))
-    protoPath = os.path.sep.join(["face_detection_model", "deploy.prototxt"])
-    modelPath = os.path.sep.join(["face_detection_model",
-    "res10_300x300_ssd_iter_140000.caffemodel"])
-    detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
-
-    embedder = cv2.dnn.readNetFromTorch("openface_nn4.small2.v1.t7")
-    recognizer = pickle.loads(open("output/recognizer.pickle", "rb").read())
-    le = pickle.loads(open("output/le.pickle", "rb").read())
-
+    
 
     
     app.run()
